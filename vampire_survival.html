@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ORGANIZADAS OROCHI</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+
+  :root {
+    --blood: #8b0000;
+    --crimson: #dc143c;
+    --gold: #c9a84c;
+    --dark: #0a0005;
+    --void: #000a00;
+    --mist: rgba(139,0,0,0.08);
+    --hp-green: #39ff14;
+    --xp-purple: #9b59b6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--void);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Crimson Text', serif;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  #screen {
+    
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  #title {
+    font-family: 'Cinzel Decorative', cursive;
+    color: var(--crimson);
+    font-size: clamp(18px, 3vw, 28px);
+    letter-spacing: 6px;
+    text-shadow: 0 0 20px var(--blood), 0 0 40px rgba(220,20,60,0.4);
+    text-align: center;
+  }
+
+  #hud {
+    
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    padding: 0 4px;
+  }
+
+  .bar-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+  }
+
+  .bar-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  .bar-bg {
+    height: 10px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  #hp-bar { background: var(--hp-green); height: 100%; width: 100%; transition: width 0.15s; border-radius: 2px; box-shadow: 0 0 8px var(--hp-green); }
+  #xp-bar { background: var(--xp-purple); height: 100%; width: 0%; transition: width 0.2s; border-radius: 2px; box-shadow: 0 0 8px var(--xp-purple); }
+
+  #score-box {
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: 11px;
+    color: var(--gold);
+    text-align: right;
+    white-space: nowrap;
+    text-shadow: 0 0 10px var(--gold);
+  }
+
+  #canvas {
+    background-color: #2e7d32; /* Um verde bonito, estilo lousa/mesa de jogo */
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 40px rgba(139,0,0,0.3);
+    display: block;
+    cursor: crosshair;
+}
+
+  #cooldown-hud {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .skill-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .skill-box {
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(220,20,60,0.5);
+    position: relative;
+    overflow: hidden;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+  }
+
+  .skill-fill {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%;
+    background: rgba(220,20,60,0.3);
+    transition: height 0.05s linear;
+  }
+
+  .skill-glyph {
+    font-size: 20px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .skill-key {
+    font-size: 9px;
+    color: var(--gold);
+    letter-spacing: 1px;
+  }
+
+  .skill-label {
+    font-size: 9px;
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    letter-spacing: 1px;
+  }
+
+  #overlay {
+    
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(5,0,10,0.92);
+    gap: 16px;
+    z-index: 10;
+  }
+
+  #overlay h1 {
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: clamp(20px, 4vw, 36px);
+    color: var(--crimson);
+    text-shadow: 0 0 30px var(--blood);
+    text-align: center;
+  }
+
+  #overlay p {
+    color: rgba(255,255,255,0.6);
+    font-size: 14px;
+    text-align: center;
+    line-height: 1.8;
+    max-width: 340px;
+  }
+
+  #overlay p strong {
+    color: var(--gold);
+  }
+
+  #start-btn {
+    font-family: 'Cinzel Decorative', cursive;
+    background: transparent;
+    border: 1px solid var(--crimson);
+    color: var(--crimson);
+    padding: 12px 32px;
+    font-size: 14px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    box-shadow: 0 0 20px rgba(220,20,60,0.2);
+  }
+
+  #start-btn:hover {
+    background: var(--crimson);
+    color: #fff;
+    box-shadow: 0 0 30px rgba(220,20,60,0.6);
+  }
+
+  #wave-announce {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: 28px;
+    color: var(--crimson);
+    text-shadow: 0 0 30px var(--blood);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 5;
+    white-space: nowrap;
+    transition: opacity 0.3s;
+  }
+</style>
+</head>
+<body>
+<div id="screen">
+  <div id="title">⚰ ORGANIZADAS OROCHI ⚰</div>
+
+  <div id="hud">
+    <div class="bar-wrap">
+      <div class="bar-label">Vida</div>
+      <div class="bar-bg"><div id="hp-bar"></div></div>
+    </div>
+    <div class="bar-wrap">
+      <div class="bar-label">Experiência</div>
+      <div class="bar-bg"><div id="xp-bar"></div></div>
+    </div>
+    <div id="score-box">
+      <div id="wave-txt">ONDA 1</div>
+      <div id="kill-txt">0 MORTES</div>
+    </div>
+  </div>
+
+  <canvas id="canvas"></canvas>
+
+  <div id="cooldown-hud">
+    <div class="skill-icon">
+      <div class="skill-box">
+        <div class="skill-fill" id="cd-bolt" style="height:0%"></div>
+        <span class="skill-glyph">🗡️</span>
+      </div>
+      <div class="skill-key">CLICK</div>
+      <div class="skill-label">PROJÉTIL</div>
+    </div>
+    <div class="skill-icon">
+      <div class="skill-box">
+        <div class="skill-fill" id="cd-aoe" style="height:0%"></div>
+        <span class="skill-glyph">💀</span>
+      </div>
+      <div class="skill-key">E / ESPAÇO</div>
+      <div class="skill-label">EXPLOSÃO</div>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay -->
+<div id="overlay" style="position:fixed">
+  <h1 id="overlay-title">ORGANIZADAS OROCHI</h1>
+  <p id="overlay-desc">
+    <strong>WASD / Setas</strong> — Mover<br>
+    <strong>Clique</strong> — Projétil direcional<br>
+    <strong>E / Espaço</strong> — Explosão em área (cd: 4s)<br><br>
+    Sobreviva às ondas de inimigos.<br>
+    Colete almas para evoluir.
+  </p>
+  <button id="start-btn">DESPERTAR</button>
+</div>
+
+<div id="wave-announce"></div>
+
+<script>
+// ─── CANVAS SETUP ───────────────────────────────────────────────
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const W = Math.min(window.innerWidth - 16, 1200);
+const H = Math.min(window.innerHeight - 160, 900);
+canvas.width = W;
+canvas.height = H;
+
+// ─── ASSETS ─────────────────────────────────────────────────────
+const playerImg = new Image();
+playerImg.src = 'player.png';
+const enemyImg = new Image();
+enemyImg.src = 'enemy.png';
+
+// Fallback drawn shapes when images fail / are missing
+let playerImgOk = false, enemyImgOk = false;
+playerImg.onload = () => playerImgOk = true;
+enemyImg.onload = () => enemyImgOk = true;
+
+// ─── STATE ──────────────────────────────────────────────────────
+let state = 'menu'; // menu | playing | dead
+const keys = {};
+let mousePos = { x: W/2, y: H/2 };
+
+const PLAYER_SPEED = 2.8;
+const PLAYER_SIZE = 40;
+const ENEMY_SIZE = 30;
+const BULLET_SPEED = 7;
+const AOE_RADIUS = 110;
+const AOE_COOLDOWN = 4000;
+const BULLET_COOLDOWN = 100;
+
+let player, enemies, bullets, particles, orbs;
+let wave, kills, score;
+let aoeCooldownLeft, bulletCooldownLeft;
+let aoeActive; // {x,y,r,maxR,alpha,t}
+let waveTimer, waveSpawning;
+let gameTime;
+
+function initGame() {
+  player = {
+    x: W/2, y: H/2,
+    hp: 100, maxHp: 100,
+    xp: 0, xpNext: 20,
+    level: 1,
+    iframes: 0,
+    vx: 0, vy: 0
+  };
+  enemies = [];
+  bullets = [];
+  particles = [];
+  orbs = [];
+  wave = 1;
+  kills = 0;
+  score = 0;
+  aoeCooldownLeft = 0;
+  bulletCooldownLeft = 0;
+  aoeActive = null;
+  waveTimer = 0;
+  waveSpawning = false;
+  gameTime = 0;
+  spawnWave();
+}
+
+// ─── SPAWNING ───────────────────────────────────────────────────
+function spawnWave() {
+  const count = 4 + wave * 3;
+  showWaveAnnounce(`ONDA ${wave}`);
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => spawnEnemy(), i * 200);
+  }
+}
+
+function spawnEnemy() {
+  const side = Math.floor(Math.random() * 4);
+  let x, y;
+  if (side === 0) { x = Math.random()*W; y = -30; }
+  else if (side === 1) { x = W+30; y = Math.random()*H; }
+  else if (side === 2) { x = Math.random()*W; y = H+30; }
+  else { x = -30; y = Math.random()*H; }
+  enemies.push({
+    x, y,
+    hp: 20 + wave * 5,
+    maxHp: 20 + wave * 5,
+    speed: 0.8 + wave * 0.08 + Math.random() * 0.4,
+    iframes: 0,
+    flash: 0
+  });
+}
+
+// ─── ATTACKS ────────────────────────────────────────────────────
+function fireBullet(tx, ty) {
+  if (bulletCooldownLeft > 0) return;
+  const dx = tx - player.x, dy = ty - player.y;
+  const d = Math.hypot(dx, dy) || 1;
+  bullets.push({
+    x: player.x, y: player.y,
+    vx: (dx/d)*BULLET_SPEED,
+    vy: (dy/d)*BULLET_SPEED,
+    life: 80,
+    trail: []
+  });
+  bulletCooldownLeft = BULLET_COOLDOWN;
+  // muzzle flash
+  for (let i = 0; i < 6; i++) spawnParticle(player.x, player.y, '#dc143c', 1.5 + Math.random()*2);
+}
+
+function triggerAOE() {
+  if (aoeCooldownLeft > 0) return;
+  aoeCooldownLeft = AOE_COOLDOWN;
+  aoeActive = { x: player.x, y: player.y, r: 0, maxR: AOE_RADIUS, t: 0 };
+
+  // AOE damage
+  enemies.forEach(e => {
+    const d = Math.hypot(e.x - player.x, e.y - player.y);
+    if (d < AOE_RADIUS) {
+      const dmg = 60;
+      e.hp -= dmg;
+      e.flash = 8;
+      spawnDmgNumber(e.x, e.y, dmg, '#ff4466');
+      for (let i = 0; i < 8; i++) spawnParticle(e.x, e.y, '#8b0000', 2+Math.random()*3);
+    }
+  });
+
+  // Big shockwave particles
+  for (let i = 0; i < 30; i++) {
+    const a = (i/30)*Math.PI*2;
+    const r = 20 + Math.random()*30;
+    particles.push({
+      x: player.x + Math.cos(a)*r,
+      y: player.y + Math.sin(a)*r,
+      vx: Math.cos(a)*(2+Math.random()*3),
+      vy: Math.sin(a)*(2+Math.random()*3),
+      life: 25 + Math.random()*15,
+      maxLife: 40,
+      color: `hsl(${Math.random()*30},100%,60%)`,
+      size: 2 + Math.random()*3,
+      type: 'circle'
+    });
+  }
+}
+
+// ─── PARTICLES ──────────────────────────────────────────────────
+function spawnParticle(x, y, color, size) {
+  const a = Math.random()*Math.PI*2;
+  const s = 1 + Math.random()*3;
+  particles.push({ x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s, life: 20+Math.random()*20, maxLife: 40, color, size, type: 'circle' });
+}
+
+const dmgNumbers = [];
+function spawnDmgNumber(x, y, val, color) {
+  dmgNumbers.push({ x, y, val, color, life: 40, vy: -1 });
+}
+
+// ─── ORB / SOUL ─────────────────────────────────────────────────
+function spawnOrb(x, y) {
+  orbs.push({ x, y, vy: -1, life: 300, collected: false });
+}
+
+// ─── UPDATE ─────────────────────────────────────────────────────
+function update(dt) {
+  gameTime += dt;
+  if (bulletCooldownLeft > 0) bulletCooldownLeft -= dt;
+  if (aoeCooldownLeft > 0) aoeCooldownLeft -= dt;
+  if (player.iframes > 0) player.iframes -= dt;
+
+  // Player movement
+  let dx = 0, dy = 0;
+  if (keys['ArrowLeft'] || keys['a'] || keys['A']) dx -= 1;
+  if (keys['ArrowRight'] || keys['d'] || keys['D']) dx += 1;
+  if (keys['ArrowUp'] || keys['w'] || keys['W']) dy -= 1;
+  if (keys['ArrowDown'] || keys['s'] || keys['S']) dy += 1;
+  const dl = Math.hypot(dx, dy) || 1;
+  if (dx || dy) {
+    player.x = Math.max(PLAYER_SIZE, Math.min(W-PLAYER_SIZE, player.x + (dx/dl)*PLAYER_SPEED));
+    player.y = Math.max(PLAYER_SIZE, Math.min(H-PLAYER_SIZE, player.y + (dy/dl)*PLAYER_SPEED));
+  }
+
+  // Bullets
+  for (let i = bullets.length-1; i >= 0; i--) {
+    const b = bullets[i];
+    b.trail.push({x: b.x, y: b.y});
+    if (b.trail.length > 8) b.trail.shift();
+    b.x += b.vx; b.y += b.vy; b.life--;
+    if (b.life <= 0 || b.x < 0 || b.x > W || b.y < 0 || b.y > H) {
+      bullets.splice(i, 1); continue;
+    }
+    // Hit enemy
+    for (let j = enemies.length-1; j >= 0; j--) {
+      const e = enemies[j];
+      if (Math.hypot(b.x - e.x, b.y - e.y) < ENEMY_SIZE) {
+        const dmg = 25;
+        e.hp -= dmg;
+        e.flash = 6;
+        spawnDmgNumber(e.x, e.y, dmg, '#ffcc00');
+        for (let k = 0; k < 5; k++) spawnParticle(b.x, b.y, '#dc143c', 2);
+        bullets.splice(i, 1);
+        break;
+      }
+    }
+  }
+
+  // Enemies
+  for (let i = enemies.length-1; i >= 0; i--) {
+    const e = enemies[i];
+    if (e.hp <= 0) {
+      kills++;
+      score += 10 * wave;
+      spawnOrb(e.x, e.y);
+      for (let k = 0; k < 10; k++) spawnParticle(e.x, e.y, '#8b0000', 2+Math.random()*3);
+      enemies.splice(i, 1); continue;
+    }
+    if (e.flash > 0) e.flash--;
+    if (e.iframes > 0) { e.iframes -= dt; continue; }
+
+    // Chase player
+    const ex = player.x - e.x, ey = player.y - e.y;
+    const ed = Math.hypot(ex, ey) || 1;
+    e.x += (ex/ed)*e.speed;
+    e.y += (ey/ed)*e.speed;
+
+    // Damage player
+    if (ed < PLAYER_SIZE + ENEMY_SIZE - 8 && player.iframes <= 0) {
+      player.hp -= 8;
+      player.iframes = 800;
+      e.iframes = 500;
+      for (let k = 0; k < 6; k++) spawnParticle(player.x, player.y, '#ff0000', 2);
+      if (player.hp <= 0) { gameOver(); return; }
+    }
+  }
+
+  // Orbs
+  for (let i = orbs.length-1; i >= 0; i--) {
+    const o = orbs[i];
+    o.life--;
+    o.y += o.vy * 0.3;
+    const od = Math.hypot(o.x - player.x, o.y - player.y);
+    if (od < 80) {
+      // Attract
+      o.x += (player.x - o.x)*0.12;
+      o.y += (player.y - o.y)*0.12;
+    }
+    if (od < 16 || o.life <= 0) {
+      if (od < 16) {
+        player.xp += 5;
+        checkLevelUp();
+        for (let k = 0; k < 4; k++) spawnParticle(player.x, player.y, '#9b59b6', 1.5);
+      }
+      orbs.splice(i, 1);
+    }
+  }
+
+  // Particles
+  for (let i = particles.length-1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx; p.y += p.vy;
+    p.vx *= 0.92; p.vy *= 0.92;
+    p.life--;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+
+  // Dmg numbers
+  for (let i = dmgNumbers.length-1; i >= 0; i--) {
+    const n = dmgNumbers[i];
+    n.y += n.vy; n.life--;
+    if (n.life <= 0) dmgNumbers.splice(i, 1);
+  }
+
+  // AOE ring
+  if (aoeActive) {
+    aoeActive.t++;
+    aoeActive.r = Math.min(aoeActive.maxR, aoeActive.r + aoeActive.maxR / 12);
+    if (aoeActive.t > 20) aoeActive = null;
+  }
+
+  // Wave progression
+  if (enemies.length === 0 && !waveSpawning) {
+    waveTimer += dt;
+    if (waveTimer > 2500) {
+      waveTimer = 0;
+      wave++;
+      spawnWave();
+    }
+  }
+
+  updateHUD();
+}
+
+function checkLevelUp() {
+  while (player.xp >= player.xpNext) {
+    player.xp -= player.xpNext;
+    player.level++;
+    player.xpNext = Math.floor(player.xpNext * 1.4);
+    player.maxHp += 15;
+    player.hp = Math.min(player.maxHp, player.hp + 30);
+    showWaveAnnounce(`NÍVEL ${player.level}!`);
+    for (let i = 0; i < 25; i++) {
+      const a = (i/25)*Math.PI*2;
+      particles.push({
+        x: player.x + Math.cos(a)*20, y: player.y + Math.sin(a)*20,
+        vx: Math.cos(a)*3, vy: Math.sin(a)*3,
+        life: 35, maxLife: 35, color: '#c9a84c', size: 2, type: 'circle'
+      });
+    }
+  }
+}
+
+// ─── DRAW ────────────────────────────────────────────────────────
+function drawBg() {
+  ctx.fillStyle = '#070010';
+  ctx.fillRect(0, 0, W, H);
+  // subtle grid
+  ctx.strokeStyle = 'rgba(139,0,0,0.05)';
+  ctx.lineWidth = 1;
+  const gs = 40;
+  for (let x = 0; x < W; x += gs) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for (let y = 0; y < H; y += gs) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  // vignette
+  const vg = ctx.createRadialGradient(W/2,H/2,H*0.2,W/2,H/2,H*0.9);
+  vg.addColorStop(0,'transparent');
+  vg.addColorStop(1,'rgba(0,0,0,0.7)');
+  ctx.fillStyle = vg;
+  ctx.fillRect(0,0,W,H);
+}
+
+function drawOrbs() {
+  orbs.forEach(o => {
+    const pulse = 0.7 + 0.3*Math.sin(gameTime*0.005 + o.x);
+    const alpha = Math.min(3, o.life/30);
+    ctx.save();
+    ctx.globalAlpha = alpha * pulse;
+    const rg = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, 8);
+    rg.addColorStop(0, '#e040fb');
+    rg.addColorStop(1, 'transparent');
+    ctx.fillStyle = rg;
+    ctx.beginPath(); ctx.arc(o.x, o.y, 8, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(o.x, o.y, 3, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+  });
+}
+
+function drawBullets() {
+  bullets.forEach(b => {
+    // Trail
+    b.trail.forEach((t, i) => {
+      const a = (i / b.trail.length) * 0.6;
+      ctx.save();
+      ctx.globalAlpha = a;
+      ctx.fillStyle = '#ff2244';
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, 3 * (i/b.trail.length), 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    });
+    // Head
+    const rg = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, 7);
+    rg.addColorStop(0,'#fff');
+    rg.addColorStop(0.3,'#ff2244');
+    rg.addColorStop(1,'transparent');
+    ctx.fillStyle = rg;
+    ctx.beginPath(); ctx.arc(b.x, b.y, 7, 0, Math.PI*2); ctx.fill();
+  });
+}
+
+function drawAOE() {
+  if (!aoeActive) return;
+  const prog = aoeActive.r / aoeActive.maxR;
+  const alpha = (1 - prog) * 0.8;
+  // fill
+  ctx.save();
+  ctx.globalAlpha = alpha * 0.2;
+  ctx.fillStyle = '#dc143c';
+  ctx.beginPath(); ctx.arc(aoeActive.x, aoeActive.y, aoeActive.r, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+  // ring
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = '#ff2244';
+  ctx.lineWidth = 3;
+  ctx.shadowColor = '#dc143c';
+  ctx.shadowBlur = 20;
+  ctx.beginPath(); ctx.arc(aoeActive.x, aoeActive.y, aoeActive.r, 0, Math.PI*2); ctx.stroke();
+  ctx.restore();
+}
+
+function drawParticles() {
+  particles.forEach(p => {
+    const a = p.life / p.maxLife;
+    ctx.save();
+    ctx.globalAlpha = a;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size * a, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  });
+}
+
+function drawDmgNumbers() {
+  dmgNumbers.forEach(n => {
+    const a = n.life / 40;
+    ctx.save();
+    ctx.globalAlpha = a;
+    ctx.font = 'bold 14px "Crimson Text", serif';
+    ctx.fillStyle = n.color;
+    ctx.textAlign = 'center';
+    ctx.shadowColor = '#000';
+    ctx.shadowBlur = 4;
+    ctx.fillText(n.val, n.x, n.y);
+    ctx.restore();
+  });
+}
+
+function drawEnemy(e) {
+  ctx.save();
+  if (e.flash > 0) {
+    ctx.filter = 'brightness(3) saturate(0)';
+  }
+  if (enemyImgOk) {
+    ctx.drawImage(enemyImg, e.x - ENEMY_SIZE, e.y - ENEMY_SIZE, ENEMY_SIZE*2, ENEMY_SIZE*2);
+  } else {
+    // fallback
+    ctx.fillStyle = e.flash > 0 ? '#fff' : '#cc2200';
+    ctx.beginPath();
+    ctx.arc(e.x, e.y, ENEMY_SIZE, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = '#ff4422';
+    ctx.font = '18px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('👹', e.x, e.y);
+  }
+  ctx.restore();
+
+  // HP bar
+  const bw = ENEMY_SIZE*2;
+  const bx = e.x - ENEMY_SIZE;
+  const by = e.y - ENEMY_SIZE - 8;
+  ctx.fillStyle = 'rgba(0,0,0,0.6)';
+  ctx.fillRect(bx, by, bw, 4);
+  ctx.fillStyle = e.hp/e.maxHp > 0.5 ? '#39ff14' : e.hp/e.maxHp > 0.25 ? '#ffaa00' : '#ff2222';
+  ctx.fillRect(bx, by, bw * (e.hp/e.maxHp), 4);
+}
+
+function drawPlayer() {
+  ctx.save();
+  // Hurt flash
+  if (player.iframes > 0 && Math.floor(gameTime/80) % 2 === 0) {
+    ctx.globalAlpha = 0.4;
+  }
+  // Shadow glow
+  ctx.shadowColor = '#dc143c';
+  ctx.shadowBlur = 20;
+
+  if (playerImgOk) {
+    ctx.drawImage(playerImg, player.x - PLAYER_SIZE, player.y - PLAYER_SIZE, PLAYER_SIZE*2, PLAYER_SIZE*2);
+  } else {
+    // fallback
+    ctx.fillStyle = '#c9a84c';
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, PLAYER_SIZE, 0, Math.PI*2);
+    ctx.fill();
+    ctx.font = '22px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🧛', player.x, player.y);
+  }
+  ctx.restore();
+
+  // Direction indicator
+  const mdx = mousePos.x - player.x, mdy = mousePos.y - player.y;
+  const md = Math.hypot(mdx, mdy) || 1;
+  ctx.save();
+  ctx.globalAlpha = 0.5;
+  ctx.strokeStyle = '#dc143c';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(player.x + (mdx/md)*(PLAYER_SIZE+4), player.y + (mdy/md)*(PLAYER_SIZE+4));
+  ctx.lineTo(player.x + (mdx/md)*50, player.y + (mdy/md)*50);
+  ctx.stroke();
+  ctx.restore();
+}
+
+// ─── HUD UPDATE ─────────────────────────────────────────────────
+function updateHUD() {
+  document.getElementById('hp-bar').style.width = Math.max(0, player.hp/player.maxHp*100) + '%';
+  document.getElementById('xp-bar').style.width = (player.xp/player.xpNext*100) + '%';
+  document.getElementById('wave-txt').textContent = `ONDA ${wave}`;
+  document.getElementById('kill-txt').textContent = `${kills} MORTES`;
+
+  // Cooldowns
+  const aoeP = aoeCooldownLeft > 0 ? (aoeCooldownLeft/AOE_COOLDOWN)*100 : 0;
+  document.getElementById('cd-aoe').style.height = aoeP + '%';
+
+  const bP = bulletCooldownLeft > 0 ? (bulletCooldownLeft/BULLET_COOLDOWN)*100 : 0;
+  document.getElementById('cd-bolt').style.height = bP + '%';
+}
+
+// ─── WAVE ANNOUNCE ──────────────────────────────────────────────
+function showWaveAnnounce(txt) {
+  const el = document.getElementById('wave-announce');
+  el.textContent = txt;
+  el.style.opacity = '1';
+  setTimeout(() => { el.style.opacity = '0'; }, 1500);
+}
+
+// ─── GAME OVER ──────────────────────────────────────────────────
+function gameOver() {
+  state = 'dead';
+  const overlay = document.getElementById('overlay');
+  document.getElementById('overlay-title').textContent = 'VOCÊ MORREU';
+  document.getElementById('overlay-desc').innerHTML =
+    `Ondas sobrevividas: <strong>${wave}</strong><br>
+     Inimigos abatidos: <strong>${kills}</strong><br>
+     Pontuação: <strong>${score}</strong><br><br>
+     SEU TIME FOI REBAIXADO…`;
+  document.getElementById('start-btn').textContent = 'TENTAR NOVAMENTE';
+  overlay.style.display = 'flex';
+}
+
+// ─── LOOP ────────────────────────────────────────────────────────
+let lastTime = 0;
+function loop(ts) {
+  const dt = ts - lastTime; lastTime = ts;
+  if (state === 'playing') {
+    update(dt);
+    drawBg();
+    drawOrbs();
+    drawParticles();
+    drawBullets();
+    enemies.forEach(drawEnemy);
+    drawPlayer();
+    drawAOE();
+    drawDmgNumbers();
+  }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+// ─── INPUT ───────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  keys[e.key] = true;
+  if (state === 'playing' && (e.key === 'e' || e.key === 'E' || e.key === ' ')) {
+    e.preventDefault();
+    triggerAOE();
+  }
+});
+document.addEventListener('keyup', e => { keys[e.key] = false; });
+
+canvas.addEventListener('mousemove', e => {
+  const r = canvas.getBoundingClientRect();
+  mousePos = { x: e.clientX - r.left, y: e.clientY - r.top };
+});
+
+canvas.addEventListener('click', e => {
+  if (state !== 'playing') return;
+  const r = canvas.getBoundingClientRect();
+  fireBullet(e.clientX - r.left, e.clientY - r.top);
+});
+
+// Touch support
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  const r = canvas.getBoundingClientRect();
+  const t = e.touches[0];
+  mousePos = { x: t.clientX - r.left, y: t.clientY - r.top };
+}, { passive: false });
+
+canvas.addEventListener('touchstart', e => {
+  if (state !== 'playing') return;
+  e.preventDefault();
+  const r = canvas.getBoundingClientRect();
+  const t = e.touches[0];
+  fireBullet(t.clientX - r.left, t.clientY - r.top);
+}, { passive: false });
+
+document.getElementById('start-btn').addEventListener('click', () => {
+  document.getElementById('overlay').style.display = 'none';
+  state = 'playing';
+  initGame();
+});
+</script>
+</body>
+</html>
