@@ -1,162 +1,217 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ORGANIZADAS OROCHI</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&display=swap');
 
   :root {
-    --blood: #8b0000;
-    --crimson: #dc143c;
-    --gold: #c9a84c;
-    --dark: #0a0005;
-    --void: #000a00;
-    --mist: rgba(139,0,0,0.08);
-    --hp-green: #39ff14;
-    --xp-purple: #9b59b6;
+    --verde:    #1a5c2a;
+    --verde2:   #1e6b31;
+    --grama:    #2e7d32;
+    --branco:   #f0f4f0;
+    --amarelo:  #f5c800;
+    --laranja:  #e8650a;
+    --vermelho: #c0392b;
+    --placar:   #0d1f0f;
+    --borda:    rgba(255,255,255,0.35);
+    --hp-cor:   #2ecc40;
+    --xp-cor:   #f5c800;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    background: var(--void);
+    background: var(--placar);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    font-family: 'Crimson Text', serif;
+    font-family: 'Barlow Condensed', sans-serif;
     overflow: hidden;
     user-select: none;
   }
 
+  /* ── Painel principal ── */
   #screen {
-    
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 0;
+    background: var(--placar);
+  }
+
+  /* ── Faixa de placar no topo ── */
+  #scoreboard {
+    width: 100%;
+    background: linear-gradient(180deg, #0a1a0c 0%, #0d1f0f 100%);
+    border-bottom: 3px solid var(--amarelo);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 12px;
+    gap: 10px;
   }
 
   #title {
-    font-family: 'Cinzel Decorative', cursive;
-    color: var(--crimson);
-    font-size: clamp(18px, 3vw, 28px);
-    letter-spacing: 6px;
-    text-shadow: 0 0 20px var(--blood), 0 0 40px rgba(220,20,60,0.4);
-    text-align: center;
+    font-family: 'Bebas Neue', sans-serif;
+    color: var(--amarelo);
+    font-size: clamp(16px, 2.5vw, 24px);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.8);
   }
 
-  #hud {
-    
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    width: 100%;
-    padding: 0 4px;
-  }
-
-  .bar-wrap {
+  /* Barras lado a lado no placar */
+  .bars-group {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 3px;
     flex: 1;
+    max-width: 220px;
+  }
+
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 
   .bar-label {
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--gold);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
+    width: 20px;
+    color: rgba(255,255,255,0.55);
   }
 
   .bar-bg {
-    height: 10px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 2px;
+    flex: 1;
+    height: 9px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 1px;
     overflow: hidden;
   }
 
-  #hp-bar { background: var(--hp-green); height: 100%; width: 100%; transition: width 0.15s; border-radius: 2px; box-shadow: 0 0 8px var(--hp-green); }
-  #xp-bar { background: var(--xp-purple); height: 100%; width: 0%; transition: width 0.2s; border-radius: 2px; box-shadow: 0 0 8px var(--xp-purple); }
-
-  #score-box {
-    font-family: 'Cinzel Decorative', cursive;
-    font-size: 11px;
-    color: var(--gold);
-    text-align: right;
-    white-space: nowrap;
-    text-shadow: 0 0 10px var(--gold);
+  #hp-bar {
+    background: var(--hp-cor);
+    height: 100%; width: 100%;
+    transition: width 0.15s;
+    border-radius: 1px;
+  }
+  #xp-bar {
+    background: var(--xp-cor);
+    height: 100%; width: 0%;
+    transition: width 0.2s;
+    border-radius: 1px;
   }
 
+  /* Marcador estilo placar de estádio */
+  #score-box {
+    font-family: 'Bebas Neue', sans-serif;
+    text-align: right;
+    line-height: 1.15;
+    white-space: nowrap;
+  }
+  #wave-txt {
+    font-size: clamp(13px, 2vw, 18px);
+    color: var(--branco);
+    letter-spacing: 2px;
+  }
+  #kill-txt {
+    font-size: clamp(11px, 1.5vw, 14px);
+    color: var(--amarelo);
+    letter-spacing: 1px;
+  }
+
+  /* ── Canvas ── */
   #canvas {
-    background-color: #2e7d32; /* Um verde bonito, estilo lousa/mesa de jogo */
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 0 40px rgba(139,0,0,0.3);
+    border-left: 3px solid rgba(255,255,255,0.25);
+    border-right: 3px solid rgba(255,255,255,0.25);
     display: block;
     cursor: crosshair;
-}
+  }
 
+  /* ── Barra de habilidades estilo dugout ── */
   #cooldown-hud {
-    display: flex;
-    gap: 12px;
     width: 100%;
+    background: linear-gradient(180deg, #0d1f0f 0%, #0a1a0c 100%);
+    border-top: 3px solid var(--amarelo);
+    display: flex;
+    align-items: center;
     justify-content: center;
+    gap: 6px;
+    padding: 5px 10px;
   }
 
   .skill-icon {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
+    gap: 2px;
   }
 
   .skill-box {
-    width: 44px;
-    height: 44px;
-    border: 1px solid rgba(220,20,60,0.5);
+    width: 42px;
+    height: 42px;
+    border: 2px solid rgba(255,255,255,0.2);
     position: relative;
     overflow: hidden;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.6);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
+    border-radius: 3px;
   }
 
   .skill-fill {
     position: absolute;
     bottom: 0; left: 0;
     width: 100%;
-    background: rgba(220,20,60,0.3);
+    background: rgba(200,50,50,0.45);
     transition: height 0.05s linear;
   }
 
   .skill-glyph {
-    font-size: 20px;
+    font-size: 19px;
     position: relative;
     z-index: 2;
   }
 
   .skill-key {
-    font-size: 9px;
-    color: var(--gold);
-    letter-spacing: 1px;
+    font-size: 8px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
   }
 
   .skill-label {
-    font-size: 9px;
-    color: rgba(255,255,255,0.5);
+    font-size: 8px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.35);
     text-align: center;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
   }
 
+  /* Separador vertical entre grupos */
+  .sep {
+    width: 1px;
+    height: 44px;
+    background: rgba(255,255,255,0.12);
+    margin: 0 4px;
+  }
+
+  /* ── Overlay de menu/game-over ── */
   #overlay {
-    
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
@@ -164,120 +219,178 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: rgba(5,0,10,0.92);
-    gap: 16px;
+    background: rgba(5, 18, 7, 0.94);
+    gap: 14px;
     z-index: 10;
   }
 
+  /* Faixa decorativa no topo do overlay */
+  #overlay::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: var(--amarelo);
+  }
+  #overlay::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 5px;
+    background: var(--amarelo);
+  }
+
   #overlay h1 {
-    font-family: 'Cinzel Decorative', cursive;
-    font-size: clamp(20px, 4vw, 36px);
-    color: var(--crimson);
-    text-shadow: 0 0 30px var(--blood);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(28px, 5vw, 52px);
+    color: var(--branco);
+    letter-spacing: 5px;
+    text-transform: uppercase;
     text-align: center;
+    line-height: 1;
+    /* sombra dupla estilo jersey number */
+    text-shadow: 3px 3px 0 var(--amarelo), 6px 6px 0 rgba(0,0,0,0.4);
+  }
+
+  .overlay-badge {
+    background: var(--amarelo);
+    color: #0d1f0f;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    padding: 3px 14px;
+    text-transform: uppercase;
   }
 
   #overlay p {
-    color: rgba(255,255,255,0.6);
-    font-size: 14px;
+    color: rgba(240,244,240,0.7);
+    font-size: 15px;
+    font-weight: 400;
     text-align: center;
-    line-height: 1.8;
-    max-width: 340px;
+    line-height: 1.9;
+    max-width: 320px;
   }
 
   #overlay p strong {
-    color: var(--gold);
+    color: var(--amarelo);
+    font-weight: 700;
   }
 
   #start-btn {
-    font-family: 'Cinzel Decorative', cursive;
-    background: transparent;
-    border: 1px solid var(--crimson);
-    color: var(--crimson);
-    padding: 12px 32px;
-    font-size: 14px;
-    letter-spacing: 3px;
+    font-family: 'Bebas Neue', sans-serif;
+    background: var(--amarelo);
+    border: none;
+    color: #0d1f0f;
+    padding: 10px 40px;
+    font-size: 20px;
+    letter-spacing: 4px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.15s;
     text-transform: uppercase;
-    box-shadow: 0 0 20px rgba(220,20,60,0.2);
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
   }
 
   #start-btn:hover {
-    background: var(--crimson);
-    color: #fff;
-    box-shadow: 0 0 30px rgba(220,20,60,0.6);
+    background: #fff;
+    transform: scale(1.04);
   }
 
+  /* ── Anúncio de onda/nível ── */
   #wave-announce {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-family: 'Cinzel Decorative', cursive;
-    font-size: 28px;
-    color: var(--crimson);
-    text-shadow: 0 0 30px var(--blood);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(24px, 4vw, 38px);
+    color: var(--branco);
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    /* Estilo placar eletrônico */
+    background: rgba(10,26,12,0.88);
+    border: 2px solid var(--amarelo);
+    padding: 6px 24px;
     pointer-events: none;
     opacity: 0;
     z-index: 5;
     white-space: nowrap;
     transition: opacity 0.3s;
+    text-shadow: 0 0 12px rgba(245,200,0,0.5);
   }
 </style>
 </head>
 <body>
 <div id="screen">
-  <div id="title">⚰ ORGANIZADAS OROCHI ⚰</div>
 
-  <div id="hud">
-    <div class="bar-wrap">
-      <div class="bar-label">Vida</div>
-      <div class="bar-bg"><div id="hp-bar"></div></div>
-    </div>
-    <div class="bar-wrap">
-      <div class="bar-label">Experiência</div>
-      <div class="bar-bg"><div id="xp-bar"></div></div>
+  <!-- Placar estilo estádio -->
+  <div id="scoreboard">
+    <div id="title">⚽ Organizadas Orochi</div>
+    <div class="bars-group">
+      <div class="bar-row">
+        <span class="bar-label">VID</span>
+        <div class="bar-bg"><div id="hp-bar"></div></div>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">XP</span>
+        <div class="bar-bg"><div id="xp-bar"></div></div>
+      </div>
     </div>
     <div id="score-box">
       <div id="wave-txt">ONDA 1</div>
-      <div id="kill-txt">0 MORTES</div>
+      <div id="kill-txt">0 ELIMINADOS</div>
     </div>
   </div>
 
   <canvas id="canvas"></canvas>
 
+  <!-- Dugout de habilidades -->
   <div id="cooldown-hud">
     <div class="skill-icon">
-      <div class="skill-box">
+      <div class="skill-box" style="border-color:rgba(255,255,255,0.35)">
         <div class="skill-fill" id="cd-bolt" style="height:0%"></div>
-        <span class="skill-glyph">🗡️</span>
+        <span class="skill-glyph">⚽</span>
       </div>
-      <div class="skill-key">CLICK</div>
-      <div class="skill-label">PROJÉTIL</div>
+      <div class="skill-key">Segurar Click</div>
+      <div class="skill-label">Chute</div>
     </div>
     <div class="skill-icon">
-      <div class="skill-box">
+      <div class="skill-box" style="border-color:rgba(200,50,50,0.6)">
         <div class="skill-fill" id="cd-aoe" style="height:0%"></div>
-        <span class="skill-glyph">💀</span>
+        <span class="skill-glyph">💥</span>
       </div>
-      <div class="skill-key">E / ESPAÇO</div>
-      <div class="skill-label">EXPLOSÃO</div>
+      <div class="skill-key">E / Espaço</div>
+      <div class="skill-label">Falta</div>
+    </div>
+    <div class="sep"></div>
+    <div class="skill-icon">
+      <div class="skill-box" style="border-color:rgba(245,200,0,0.5)">
+        <span class="skill-glyph">⚡</span>
+      </div>
+      <div class="skill-key" id="firerate-txt" style="color:#f5c800">100ms</div>
+      <div class="skill-label">Cadência</div>
+    </div>
+    <div class="skill-icon">
+      <div class="skill-box" style="border-color:rgba(232,101,10,0.6)">
+        <span class="skill-glyph">🎯</span>
+      </div>
+      <div class="skill-key" id="spray-txt" style="color:#e8650a">1 bola</div>
+      <div class="skill-label" id="spray-next" style="color:rgba(232,101,10,0.7)">+1 lv10</div>
     </div>
   </div>
 </div>
 
-<!-- Overlay -->
+<!-- Overlay menu / game over -->
 <div id="overlay" style="position:fixed">
-  <h1 id="overlay-title">ORGANIZADAS OROCHI</h1>
+  <div class="overlay-badge">Torcida Organizada</div>
+  <h1 id="overlay-title">Organizadas<br>Orochi</h1>
   <p id="overlay-desc">
     <strong>WASD / Setas</strong> — Mover<br>
-    <strong>Clique</strong> — Senta o dedo no safado <br>
-    <strong>E / Espaço</strong> — Rojão em Área (cd: 4s)<br><br>
-    Sobreviva às ondas de inimigos.<br>
-    Colete orbs para evoluir.
+    <strong>Segurar Clique</strong> — Chutar (automático)<br>
+    <strong>E / Espaço</strong> — Falta em área (cd: 4s)<br><br>
+    Suba de nível para aumentar a cadência.<br>
+    A cada <strong>10 níveis</strong> chuta mais bolas de vez.
   </p>
-  <button id="start-btn">Começar</button>
+  <button id="start-btn">Entrar em Campo</button>
 </div>
 
 <div id="wave-announce"></div>
@@ -297,15 +410,16 @@ playerImg.src = 'player.png';
 const enemyImg = new Image();
 enemyImg.src = 'enemy.png';
 
-// Fallback drawn shapes when images fail / are missing
 let playerImgOk = false, enemyImgOk = false;
 playerImg.onload = () => playerImgOk = true;
 enemyImg.onload = () => enemyImgOk = true;
 
 // ─── STATE ──────────────────────────────────────────────────────
-let state = 'menu'; // menu | playing | dead
+let state = 'menu';
 const keys = {};
 let mousePos = { x: W/2, y: H/2 };
+// ► NOVO: controle do botão do mouse pressionado
+let mouseDown = false;
 
 const PLAYER_SPEED = 2.8;
 const PLAYER_SIZE = 40;
@@ -313,14 +427,34 @@ const ENEMY_SIZE = 30;
 const BULLET_SPEED = 7;
 const AOE_RADIUS = 110;
 const AOE_COOLDOWN = 4000;
-const BULLET_COOLDOWN = 100;
+
+// ► Cooldown BASE do projétil — será reduzido por nível
+const BULLET_COOLDOWN_BASE = 100;  // ms no nível 1
+const BULLET_COOLDOWN_MIN  = 60;   // ms mínimo (máximo fire rate)
+// Fórmula: cooldown = max(MIN, BASE - (level-1) * 5)
 
 let player, enemies, bullets, particles, orbs;
 let wave, kills, score;
 let aoeCooldownLeft, bulletCooldownLeft;
-let aoeActive; // {x,y,r,maxR,alpha,t}
+let aoeActive;
 let waveTimer, waveSpawning;
 let gameTime;
+
+// ► Retorna o cooldown atual baseado no nível do player
+function getBulletCooldown() {
+  if (!player) return BULLET_COOLDOWN_BASE;
+  return Math.max(BULLET_COOLDOWN_MIN, BULLET_COOLDOWN_BASE - (player.level - 1) * 5);
+}
+
+// ► Retorna quantos projéteis por disparo (shotgun)
+// A cada 10 níveis ganha +1 projétil: nível 1-9 = 1, 10-19 = 2, 20-29 = 3 ...
+function getShotCount() {
+  if (!player) return 1;
+  return 1 + Math.floor((player.level - 1) / 10);
+}
+
+// ► Ângulo de abertura do spray (em radianos) por projétil extra
+const SPRAY_ANGLE = 0.18; // ~10° entre cada projétil
 
 function initGame() {
   player = {
@@ -377,17 +511,26 @@ function spawnEnemy() {
 function fireBullet(tx, ty) {
   if (bulletCooldownLeft > 0) return;
   const dx = tx - player.x, dy = ty - player.y;
-  const d = Math.hypot(dx, dy) || 1;
-  bullets.push({
-    x: player.x, y: player.y,
-    vx: (dx/d)*BULLET_SPEED,
-    vy: (dy/d)*BULLET_SPEED,
-    life: 80,
-    trail: []
-  });
-  bulletCooldownLeft = BULLET_COOLDOWN;
-  // muzzle flash
-  for (let i = 0; i < 6; i++) spawnParticle(player.x, player.y, '#dc143c', 1.5 + Math.random()*2);
+  const baseAngle = Math.atan2(dy, dx);
+  const count = getShotCount();
+
+  // Distribui os projéteis simetricamente ao redor do ângulo base
+  // ex: count=1 → [0], count=2 → [-0.09, +0.09], count=3 → [-0.18, 0, +0.18]
+  for (let i = 0; i < count; i++) {
+    const offset = (i - (count - 1) / 2) * SPRAY_ANGLE;
+    const angle = baseAngle + offset;
+    bullets.push({
+      x: player.x, y: player.y,
+      vx: Math.cos(angle) * BULLET_SPEED,
+      vy: Math.sin(angle) * BULLET_SPEED,
+      life: 80,
+      trail: []
+    });
+  }
+
+  bulletCooldownLeft = getBulletCooldown();
+  // Mais partículas quanto mais projéteis
+  for (let i = 0; i < 4 + count * 2; i++) spawnParticle(player.x, player.y, '#dc143c', 1.5 + Math.random()*2);
 }
 
 function triggerAOE() {
@@ -395,7 +538,6 @@ function triggerAOE() {
   aoeCooldownLeft = AOE_COOLDOWN;
   aoeActive = { x: player.x, y: player.y, r: 0, maxR: AOE_RADIUS, t: 0 };
 
-  // AOE damage
   enemies.forEach(e => {
     const d = Math.hypot(e.x - player.x, e.y - player.y);
     if (d < AOE_RADIUS) {
@@ -407,7 +549,6 @@ function triggerAOE() {
     }
   });
 
-  // Big shockwave particles
   for (let i = 0; i < 30; i++) {
     const a = (i/30)*Math.PI*2;
     const r = 20 + Math.random()*30;
@@ -437,7 +578,6 @@ function spawnDmgNumber(x, y, val, color) {
   dmgNumbers.push({ x, y, val, color, life: 40, vy: -1 });
 }
 
-// ─── ORB / SOUL ─────────────────────────────────────────────────
 function spawnOrb(x, y) {
   orbs.push({ x, y, vy: -1, life: 300, collected: false });
 }
@@ -448,6 +588,11 @@ function update(dt) {
   if (bulletCooldownLeft > 0) bulletCooldownLeft -= dt;
   if (aoeCooldownLeft > 0) aoeCooldownLeft -= dt;
   if (player.iframes > 0) player.iframes -= dt;
+
+  // ► DISPARO AUTOMÁTICO: se mouse estiver pressionado, atira direto para o cursor
+  if (mouseDown) {
+    fireBullet(mousePos.x, mousePos.y);
+  }
 
   // Player movement
   let dx = 0, dy = 0;
@@ -470,7 +615,6 @@ function update(dt) {
     if (b.life <= 0 || b.x < 0 || b.x > W || b.y < 0 || b.y > H) {
       bullets.splice(i, 1); continue;
     }
-    // Hit enemy
     for (let j = enemies.length-1; j >= 0; j--) {
       const e = enemies[j];
       if (Math.hypot(b.x - e.x, b.y - e.y) < ENEMY_SIZE) {
@@ -497,14 +641,10 @@ function update(dt) {
     }
     if (e.flash > 0) e.flash--;
     if (e.iframes > 0) { e.iframes -= dt; continue; }
-
-    // Chase player
     const ex = player.x - e.x, ey = player.y - e.y;
     const ed = Math.hypot(ex, ey) || 1;
     e.x += (ex/ed)*e.speed;
     e.y += (ey/ed)*e.speed;
-
-    // Damage player
     if (ed < PLAYER_SIZE + ENEMY_SIZE - 8 && player.iframes <= 0) {
       player.hp -= 8;
       player.iframes = 800;
@@ -521,7 +661,6 @@ function update(dt) {
     o.y += o.vy * 0.3;
     const od = Math.hypot(o.x - player.x, o.y - player.y);
     if (od < 80) {
-      // Attract
       o.x += (player.x - o.x)*0.12;
       o.y += (player.y - o.y)*0.12;
     }
@@ -544,21 +683,18 @@ function update(dt) {
     if (p.life <= 0) particles.splice(i, 1);
   }
 
-  // Dmg numbers
   for (let i = dmgNumbers.length-1; i >= 0; i--) {
     const n = dmgNumbers[i];
     n.y += n.vy; n.life--;
     if (n.life <= 0) dmgNumbers.splice(i, 1);
   }
 
-  // AOE ring
   if (aoeActive) {
     aoeActive.t++;
     aoeActive.r = Math.min(aoeActive.maxR, aoeActive.r + aoeActive.maxR / 12);
     if (aoeActive.t > 20) aoeActive = null;
   }
 
-  // Wave progression
   if (enemies.length === 0 && !waveSpawning) {
     waveTimer += dt;
     if (waveTimer > 2500) {
@@ -578,7 +714,24 @@ function checkLevelUp() {
     player.xpNext = Math.floor(player.xpNext * 1.4);
     player.maxHp += 15;
     player.hp = Math.min(player.maxHp, player.hp + 30);
-    showWaveAnnounce(`NÍVEL ${player.level}!`);
+
+    // Aviso especial a cada 10 níveis (ganhou +1 projétil)
+    if (player.level % 10 === 0) {
+      const shots = getShotCount();
+      showWaveAnnounce(`NÍVEL ${player.level}! 🔫 SHOTGUN x${shots}`);
+      // Partículas extras em laranja para destacar
+      for (let i = 0; i < 40; i++) {
+        const a = (i/40)*Math.PI*2;
+        particles.push({
+          x: player.x + Math.cos(a)*25, y: player.y + Math.sin(a)*25,
+          vx: Math.cos(a)*4, vy: Math.sin(a)*4,
+          life: 45, maxLife: 45, color: '#ff6600', size: 3, type: 'circle'
+        });
+      }
+    } else {
+      showWaveAnnounce(`NÍVEL ${player.level}! ⚡ +cadência`);
+    }
+
     for (let i = 0; i < 25; i++) {
       const a = (i/25)*Math.PI*2;
       particles.push({
@@ -590,28 +743,94 @@ function checkLevelUp() {
   }
 }
 
-// ─── DRAW ────────────────────────────────────────────────────────
+// ─── DRAW BACKGROUND (campo de futebol) ─────────────────────────
 function drawBg() {
-  ctx.fillStyle = '#070010';
-  ctx.fillRect(0, 0, W, H);
-  // subtle grid
-  ctx.strokeStyle = 'rgba(139,0,0,0.05)';
-  ctx.lineWidth = 1;
-  const gs = 40;
-  for (let x = 0; x < W; x += gs) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-  for (let y = 0; y < H; y += gs) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
-  // vignette
-  const vg = ctx.createRadialGradient(W/2,H/2,H*0.2,W/2,H/2,H*0.9);
-  vg.addColorStop(0,'transparent');
-  vg.addColorStop(1,'rgba(0,0,0,0.7)');
+  // ► Faixas alternadas de grama
+  const stripeW = 80;
+  for (let x = 0; x < W; x += stripeW) {
+    ctx.fillStyle = (Math.floor(x / stripeW) % 2 === 0) ? '#2e7d32' : '#388e3c';
+    ctx.fillRect(x, 0, stripeW, H);
+  }
+
+  // ► Linhas do campo (brancas semitransparentes)
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+  ctx.lineWidth = 2;
+
+  // Borda do campo
+  const mg = 28;
+  ctx.strokeRect(mg, mg, W - mg*2, H - mg*2);
+
+  // Linha do meio
+  ctx.beginPath();
+  ctx.moveTo(W/2, mg);
+  ctx.lineTo(W/2, H - mg);
+  ctx.stroke();
+
+  // Círculo central
+  ctx.beginPath();
+  ctx.arc(W/2, H/2, Math.min(W,H)*0.12, 0, Math.PI*2);
+  ctx.stroke();
+
+  // Ponto central
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.beginPath();
+  ctx.arc(W/2, H/2, 4, 0, Math.PI*2);
+  ctx.fill();
+
+  // Área grande esquerda
+  const areaW = W * 0.16, areaH = H * 0.5;
+  ctx.strokeRect(mg, (H - areaH)/2, areaW, areaH);
+
+  // Área grande direita
+  ctx.strokeRect(W - mg - areaW, (H - areaH)/2, areaW, areaH);
+
+  // Área pequena esquerda
+  const smallW = W * 0.07, smallH = H * 0.28;
+  ctx.strokeRect(mg, (H - smallH)/2, smallW, smallH);
+
+  // Área pequena direita
+  ctx.strokeRect(W - mg - smallW, (H - smallH)/2, smallW, smallH);
+
+  // Arcos das áreas (semicírculo)
+  ctx.beginPath();
+  ctx.arc(mg + areaW, H/2, Math.min(W,H)*0.09, -Math.PI*0.55, Math.PI*0.55);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(W - mg - areaW, H/2, Math.min(W,H)*0.09, Math.PI*0.45, Math.PI*1.55);
+  ctx.stroke();
+
+  // Pontos de pênalti
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.beginPath();
+  ctx.arc(mg + areaW * 0.7, H/2, 4, 0, Math.PI*2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(W - mg - areaW * 0.7, H/2, 4, 0, Math.PI*2);
+  ctx.fill();
+
+  // Gols (retângulos nas bordas)
+  const goalH = H * 0.13, goalW = 14;
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  ctx.fillRect(mg - goalW, (H - goalH)/2, goalW, goalH);
+  ctx.fillRect(W - mg, (H - goalH)/2, goalW, goalH);
+  ctx.strokeRect(mg - goalW, (H - goalH)/2, goalW, goalH);
+  ctx.strokeRect(W - mg, (H - goalH)/2, goalW, goalH);
+
+  ctx.restore();
+
+  // ► Vinheta suave nas bordas
+  const vg = ctx.createRadialGradient(W/2, H/2, H*0.25, W/2, H/2, H*0.85);
+  vg.addColorStop(0, 'transparent');
+  vg.addColorStop(1, 'rgba(0,0,0,0.45)');
   ctx.fillStyle = vg;
-  ctx.fillRect(0,0,W,H);
+  ctx.fillRect(0, 0, W, H);
 }
 
 function drawOrbs() {
   orbs.forEach(o => {
     const pulse = 0.7 + 0.3*Math.sin(gameTime*0.005 + o.x);
-    const alpha = Math.min(3, o.life/30);
+    const alpha = Math.min(1, o.life/30);
     ctx.save();
     ctx.globalAlpha = alpha * pulse;
     const rg = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, 8);
@@ -627,7 +846,6 @@ function drawOrbs() {
 
 function drawBullets() {
   bullets.forEach(b => {
-    // Trail
     b.trail.forEach((t, i) => {
       const a = (i / b.trail.length) * 0.6;
       ctx.save();
@@ -638,7 +856,6 @@ function drawBullets() {
       ctx.fill();
       ctx.restore();
     });
-    // Head
     const rg = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, 7);
     rg.addColorStop(0,'#fff');
     rg.addColorStop(0.3,'#ff2244');
@@ -652,13 +869,11 @@ function drawAOE() {
   if (!aoeActive) return;
   const prog = aoeActive.r / aoeActive.maxR;
   const alpha = (1 - prog) * 0.8;
-  // fill
   ctx.save();
   ctx.globalAlpha = alpha * 0.2;
   ctx.fillStyle = '#dc143c';
   ctx.beginPath(); ctx.arc(aoeActive.x, aoeActive.y, aoeActive.r, 0, Math.PI*2); ctx.fill();
   ctx.restore();
-  // ring
   ctx.save();
   ctx.globalAlpha = alpha;
   ctx.strokeStyle = '#ff2244';
@@ -699,29 +914,19 @@ function drawDmgNumbers() {
 
 function drawEnemy(e) {
   ctx.save();
-  if (e.flash > 0) {
-    ctx.filter = 'brightness(3) saturate(0)';
-  }
+  if (e.flash > 0) ctx.filter = 'brightness(3) saturate(0)';
   if (enemyImgOk) {
     ctx.drawImage(enemyImg, e.x - ENEMY_SIZE, e.y - ENEMY_SIZE, ENEMY_SIZE*2, ENEMY_SIZE*2);
   } else {
-    // fallback
     ctx.fillStyle = e.flash > 0 ? '#fff' : '#cc2200';
-    ctx.beginPath();
-    ctx.arc(e.x, e.y, ENEMY_SIZE, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = '#ff4422';
+    ctx.beginPath(); ctx.arc(e.x, e.y, ENEMY_SIZE, 0, Math.PI*2); ctx.fill();
     ctx.font = '18px serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('👹', e.x, e.y);
   }
   ctx.restore();
-
-  // HP bar
-  const bw = ENEMY_SIZE*2;
-  const bx = e.x - ENEMY_SIZE;
-  const by = e.y - ENEMY_SIZE - 8;
+  const bw = ENEMY_SIZE*2, bx = e.x - ENEMY_SIZE, by = e.y - ENEMY_SIZE - 8;
   ctx.fillStyle = 'rgba(0,0,0,0.6)';
   ctx.fillRect(bx, by, bw, 4);
   ctx.fillStyle = e.hp/e.maxHp > 0.5 ? '#39ff14' : e.hp/e.maxHp > 0.25 ? '#ffaa00' : '#ff2222';
@@ -730,22 +935,14 @@ function drawEnemy(e) {
 
 function drawPlayer() {
   ctx.save();
-  // Hurt flash
-  if (player.iframes > 0 && Math.floor(gameTime/80) % 2 === 0) {
-    ctx.globalAlpha = 0.4;
-  }
-  // Shadow glow
+  if (player.iframes > 0 && Math.floor(gameTime/80) % 2 === 0) ctx.globalAlpha = 0.4;
   ctx.shadowColor = '#dc143c';
   ctx.shadowBlur = 20;
-
   if (playerImgOk) {
     ctx.drawImage(playerImg, player.x - PLAYER_SIZE, player.y - PLAYER_SIZE, PLAYER_SIZE*2, PLAYER_SIZE*2);
   } else {
-    // fallback
     ctx.fillStyle = '#c9a84c';
-    ctx.beginPath();
-    ctx.arc(player.x, player.y, PLAYER_SIZE, 0, Math.PI*2);
-    ctx.fill();
+    ctx.beginPath(); ctx.arc(player.x, player.y, PLAYER_SIZE, 0, Math.PI*2); ctx.fill();
     ctx.font = '22px serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -753,17 +950,16 @@ function drawPlayer() {
   }
   ctx.restore();
 
-  // Direction indicator
   const mdx = mousePos.x - player.x, mdy = mousePos.y - player.y;
   const md = Math.hypot(mdx, mdy) || 1;
   ctx.save();
-  ctx.globalAlpha = 0.5;
-  ctx.strokeStyle = '#dc143c';
-  ctx.lineWidth = 1;
+  ctx.globalAlpha = mouseDown ? 0.9 : 0.45;
+  ctx.strokeStyle = mouseDown ? '#ff4466' : '#dc143c';
+  ctx.lineWidth = mouseDown ? 2 : 1;
   ctx.setLineDash([4, 4]);
   ctx.beginPath();
   ctx.moveTo(player.x + (mdx/md)*(PLAYER_SIZE+4), player.y + (mdy/md)*(PLAYER_SIZE+4));
-  ctx.lineTo(player.x + (mdx/md)*50, player.y + (mdy/md)*50);
+  ctx.lineTo(player.x + (mdx/md)*60, player.y + (mdy/md)*60);
   ctx.stroke();
   ctx.restore();
 }
@@ -773,36 +969,43 @@ function updateHUD() {
   document.getElementById('hp-bar').style.width = Math.max(0, player.hp/player.maxHp*100) + '%';
   document.getElementById('xp-bar').style.width = (player.xp/player.xpNext*100) + '%';
   document.getElementById('wave-txt').textContent = `ONDA ${wave}`;
-  document.getElementById('kill-txt').textContent = `${kills} MORTES`;
+  document.getElementById('kill-txt').textContent = `${kills} ELIMINADOS`;
 
-  // Cooldowns
   const aoeP = aoeCooldownLeft > 0 ? (aoeCooldownLeft/AOE_COOLDOWN)*100 : 0;
   document.getElementById('cd-aoe').style.height = aoeP + '%';
 
-  const bP = bulletCooldownLeft > 0 ? (bulletCooldownLeft/BULLET_COOLDOWN)*100 : 0;
+  const cd = getBulletCooldown();
+  const bP = bulletCooldownLeft > 0 ? (bulletCooldownLeft/cd)*100 : 0;
   document.getElementById('cd-bolt').style.height = bP + '%';
+
+  // ► Mostra cadência atual
+  document.getElementById('firerate-txt').textContent = cd + 'ms';
+
+  // ► Mostra quantidade de projéteis (shotgun)
+  const shots = getShotCount();
+  const nextShot = 10 - ((player.level - 1) % 10) - 1; // níveis até o próximo
+  document.getElementById('spray-txt').textContent = `${shots} bola${shots > 1 ? 's' : ''}`;
+  document.getElementById('spray-next').textContent = nextShot > 0 ? `+1 lv${player.level + nextShot}` : '🔥 MAX';
 }
 
-// ─── WAVE ANNOUNCE ──────────────────────────────────────────────
 function showWaveAnnounce(txt) {
   const el = document.getElementById('wave-announce');
   el.textContent = txt;
   el.style.opacity = '1';
-  setTimeout(() => { el.style.opacity = '0'; }, 1500);
+  setTimeout(() => { el.style.opacity = '0'; }, 1800);
 }
 
-// ─── GAME OVER ──────────────────────────────────────────────────
 function gameOver() {
   state = 'dead';
-  const overlay = document.getElementById('overlay');
-  document.getElementById('overlay-title').textContent = 'VOCÊ MORREU';
+  mouseDown = false;
+  document.getElementById('overlay-title').textContent = 'FIM DE JOGO';
   document.getElementById('overlay-desc').innerHTML =
-    `Ondas sobrevividas: <strong>${wave}</strong><br>
-     Inimigos abatidos: <strong>${kills}</strong><br>
+    `Ondas aguentadas: <strong>${wave}</strong><br>
+     Adversários eliminados: <strong>${kills}</strong><br>
      Pontuação: <strong>${score}</strong><br><br>
-     SEU TIME FOI REBAIXADO…`;
-  document.getElementById('start-btn').textContent = 'TENTAR NOVAMENTE';
-  overlay.style.display = 'flex';
+     O time foi rebaixado para a série C…`;
+  document.getElementById('start-btn').textContent = 'Voltar ao Campo';
+  document.getElementById('overlay').style.display = 'flex';
 }
 
 // ─── LOOP ────────────────────────────────────────────────────────
@@ -839,11 +1042,20 @@ canvas.addEventListener('mousemove', e => {
   mousePos = { x: e.clientX - r.left, y: e.clientY - r.top };
 });
 
-canvas.addEventListener('click', e => {
+// ► SUBSTITUÍDO: mousedown/mouseup no lugar de click
+canvas.addEventListener('mousedown', e => {
   if (state !== 'playing') return;
-  const r = canvas.getBoundingClientRect();
-  fireBullet(e.clientX - r.left, e.clientY - r.top);
+  if (e.button === 0) {
+    mouseDown = true;
+    // Atira imediatamente ao pressionar
+    fireBullet(mousePos.x, mousePos.y);
+  }
 });
+canvas.addEventListener('mouseup', e => {
+  if (e.button === 0) mouseDown = false;
+});
+// Garante reset se mouse sair do canvas
+canvas.addEventListener('mouseleave', () => { mouseDown = false; });
 
 // Touch support
 canvas.addEventListener('touchmove', e => {
@@ -856,14 +1068,19 @@ canvas.addEventListener('touchmove', e => {
 canvas.addEventListener('touchstart', e => {
   if (state !== 'playing') return;
   e.preventDefault();
+  mouseDown = true;
   const r = canvas.getBoundingClientRect();
   const t = e.touches[0];
-  fireBullet(t.clientX - r.left, t.clientY - r.top);
+  mousePos = { x: t.clientX - r.left, y: t.clientY - r.top };
+  fireBullet(mousePos.x, mousePos.y);
 }, { passive: false });
+
+canvas.addEventListener('touchend', () => { mouseDown = false; });
 
 document.getElementById('start-btn').addEventListener('click', () => {
   document.getElementById('overlay').style.display = 'none';
   state = 'playing';
+  mouseDown = false;
   initGame();
 });
 </script>
